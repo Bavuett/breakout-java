@@ -19,12 +19,14 @@ public class GamePanel extends JPanel implements Runnable {
 	static final int PADDLE_HEIGHT = 10;  //orizzontale
 	
 	static final Dimension SCREEN_SIZE = new Dimension(GAME_WIDTH, GAME_HEIGHT);
-	static final int BALL_DIAMETER = 15;  //palla rotonda
+	static final int BALL_DIAMETER = 8;  //palla rotonda
 
-	static final int rows = 8;
-	static final int columns = 14;
+	int lives = 3;
+
+	static final int rows = 14;
+	static final int columns = 8;
 	
-	static final int brickWidth = 56;
+	static final int brickWidth = 32;
 	static final int brickHeight = 10;
 	
 	//remarks from Mr. Alcorn:
@@ -42,12 +44,10 @@ public class GamePanel extends JPanel implements Runnable {
 	Paddle paddle1;
 	Ball ball;
 	Brick[][] brick;
-	// istanza "paddle1" dalla classe Paddle
 	
 	GamePanel(){ //costruttore
 		Random random = new Random();
 		//creo una istanza "ball" dalla classe Ball al centro dello schermo ma ad una altezza casuale
-		ball = new Ball((GAME_WIDTH/2)-(BALL_DIAMETER/2),random.nextInt(GAME_HEIGHT-BALL_DIAMETER),BALL_DIAMETER,BALL_DIAMETER);
 		brick = new Brick[rows][columns];
 		
 		this.setFocusable(true);
@@ -57,6 +57,7 @@ public class GamePanel extends JPanel implements Runnable {
 		
 		newPaddles();
 		newBricks();
+		newBall();
 		
 		this.setFocusable(true);
 		this.setPreferredSize(SCREEN_SIZE1);
@@ -84,6 +85,10 @@ public class GamePanel extends JPanel implements Runnable {
 			}
 		}
 	}
+
+	public void newBall() {
+		ball = new Ball((GAME_WIDTH / 2) - (BALL_DIAMETER / 2), (GAME_HEIGHT / 2) - (BALL_DIAMETER / 2), BALL_DIAMETER, BALL_DIAMETER);
+	}
 	
 //------------------------------- non toccare -------------------------------
 	public void paintComponent(Graphics g) {
@@ -95,7 +100,7 @@ public class GamePanel extends JPanel implements Runnable {
 		
 		draw(graphics);
 		
-		g.drawImage(buffer,0,0,this);
+		g.drawImage(buffer, 0, 0, this);
 		
 	}
 //----------------------------------------------------------------------------
@@ -138,32 +143,72 @@ public class GamePanel extends JPanel implements Runnable {
 		
 	
 		//---- stops paddles at window edges ----------------
-		if(paddle1.x <= 0)
+		if (paddle1.x <= 0)
 			paddle1.x = 0;
 
-		if(paddle1.x >= GAME_WIDTH-PADDLE_WIDTH) 
+		if (paddle1.x >= GAME_WIDTH-PADDLE_WIDTH) 
 			paddle1.x = GAME_WIDTH-PADDLE_WIDTH; 
 		
 		
-		if(ball.y <= 0) {
+		if (ball.y <= 0) {
 			ball.dy= -ball.dy;
 		}
 
-		if(ball.y >= GAME_HEIGHT-BALL_DIAMETER) {
+		if (ball.y >= GAME_HEIGHT-BALL_DIAMETER) {
 			ball.dy= -ball.dy;
-		
+
+			if (lives > 0) {
+				lives = lives - 1;
+			}
+
+			checkIfLost(lives);
+			newBall();
 		}
 		//----- la palla rimbalza quando tocca i margini destro e sinistro della finestra ------
-		if(ball.x <=0) {
+		if (ball.x <=0) {
 			ball.dx= -ball.dx;	
 		}
 
-		if(ball.x >= GAME_WIDTH-BALL_DIAMETER) {
+		if (ball.x >= GAME_WIDTH-BALL_DIAMETER) {
 			ball.dx= -ball.dx;	
 		}
 		
+		// This code handles collisions with the Paddle.
 		if (ball.intersects(paddle1)) {
+			double inclination;
+
+			// This awful if-else chain handles the inclination the Ball needs to take when 
+			// having a collision with the Paddle. This ensures the Ball does not go in the same
+			// places and keeps the game fun.
+			if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + PADDLE_WIDTH / 8) {
+				inclination = 1.6;
+			} else {
+				if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 2) {
+					inclination = 1.4;
+				} else {
+					if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 3) {
+						inclination = 0.7;
+					} else {
+						if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 5) {
+							inclination = 0;
+						} else {
+							if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 6) {
+								inclination = -0.7;
+							} else {
+								if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 7) {
+									inclination = -1.4;
+								} else {
+									inclination = -1.6;
+								}
+							}
+						}
+					}
+				}	
+			}
+
+			// Setting the values inside the class after calculating the inclination.
 			ball.dy = -ball.dy;
+			ball.setDX(inclination);
 		}
 
 		// This code takes care of Brick collisions.
@@ -243,6 +288,19 @@ public class GamePanel extends JPanel implements Runnable {
 		
 		}
 	
-	} //end public class AL
+	}
+	
+	public void checkIfLost(int lives) {
+		int remainingLives = lives;
+		System.out.println(lives);
+
+		if (remainingLives < 1) {
+			beginAttractMode();
+		}	
+	}
+
+	public void beginAttractMode() {
+		System.out.println("Beginnning attract mode.");
+	}
 	
 } //end GamePanel
