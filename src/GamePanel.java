@@ -22,6 +22,7 @@ public class GamePanel extends JPanel implements Runnable {
 	static final int BALL_DIAMETER = 8;  //palla rotonda
 
 	int lives = 3;
+	boolean attractModeActive = true;
 
 	static final int rows = 14;
 	static final int columns = 8;
@@ -44,20 +45,31 @@ public class GamePanel extends JPanel implements Runnable {
 	Paddle paddle1;
 	Ball ball;
 	Brick[][] brick;
+	Welcome welcome;
+	Lives livesUI;
+	Font atari;
 	
 	GamePanel(){ //costruttore
 		Random random = new Random();
 		//creo una istanza "ball" dalla classe Ball al centro dello schermo ma ad una altezza casuale
 		brick = new Brick[rows][columns];
-		
+		livesUI = new Lives(GAME_WIDTH - 20, GAME_HEIGHT - 20, 20, 20);
+
+		try {
+			atari = Font.createFont(Font.TRUETYPE_FONT, new FileInputStream("src/fonts/Atari.ttf")).deriveFont(20f);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	
 		this.setFocusable(true);
 		this.setPreferredSize(SCREEN_SIZE1);
 		gameThread = new Thread(this);
 		gameThread.start();
 		
-		newPaddles();
+		attractModePaddles();
 		newBricks();
 		newBall();
+		newWelcome();
 		
 		this.setFocusable(true);
 		this.setPreferredSize(SCREEN_SIZE1);
@@ -89,6 +101,14 @@ public class GamePanel extends JPanel implements Runnable {
 	public void newBall() {
 		ball = new Ball((GAME_WIDTH / 2) - (BALL_DIAMETER / 2), (GAME_HEIGHT / 2) - (BALL_DIAMETER / 2), BALL_DIAMETER, BALL_DIAMETER);
 	}
+
+	public void newWelcome() {
+		welcome = new Welcome(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH / 15, GAME_HEIGHT / 15);
+	}
+
+	public void destroyWelcome() {
+		welcome = null;
+	}
 	
 //------------------------------- non toccare -------------------------------
 	public void paintComponent(Graphics g) {
@@ -109,7 +129,11 @@ public class GamePanel extends JPanel implements Runnable {
 	public void draw(Graphics g) {
 		
 		paddle1.draw(g);
-		ball.draw(g); 
+		ball.draw(g);
+
+		if (welcome != null) {
+			welcome.draw(g, atari, GAME_WIDTH, GAME_HEIGHT);
+		}
 
 		for (int p = 0; p < rows; p++) {
 			for (int l = 0; l < columns; l++) {
@@ -119,6 +143,7 @@ public class GamePanel extends JPanel implements Runnable {
 			}
 		}
 		
+		livesUI.draw(g, atari, GAME_WIDTH, GAME_HEIGHT, lives);
 		// disegna altri oggetti qui
 		
         // the following line helps with animation ---------------------------
@@ -216,8 +241,11 @@ public class GamePanel extends JPanel implements Runnable {
 			for (int t = 0; t < columns; t++) {
 				if (brick[r][t] != null) {
 					if (ball.intersects(brick[r][t])) {
-						brick[r][t] = null;
 						ball.dy = -ball.dy;
+						
+						if (attractModeActive != true) {
+							brick[r][t] = null;
+						}
 					}
 				}
 			}
@@ -231,13 +259,13 @@ public class GamePanel extends JPanel implements Runnable {
 	public void run() { //game loop
 
 		long lastTime = System.nanoTime();
-		double amountOfFPS =60.0; // frames in 1 second
-		double duration = 1000000000/amountOfFPS; //interval (time in ns) beetween 2 frames
+		double amountOfFPS = 60.0; // frames in 1 second
+		double duration = 1000000000 / amountOfFPS; //interval (time in ns) beetween 2 frames
 		double delta = 0;
 
 		while(true) { //per sempre
 			long now = System.nanoTime();
-			delta += (now -lastTime)/duration; // tempo trascorso è > intervallo? se sì, incrementa delta
+			delta += (now - lastTime) / duration; // tempo trascorso è > intervallo? se sì, incrementa delta
 			lastTime = now;
 
 			if(delta >=1) {
@@ -265,11 +293,23 @@ public class GamePanel extends JPanel implements Runnable {
 		public void keyPressed(KeyEvent e) {
 			
 			//paddle1.keyPressed(e);
-			if(e.getKeyCode()==KeyEvent.VK_LEFT) {
+			if(e.getKeyCode() == KeyEvent.VK_LEFT && attractModeActive == false) {
 				paddle1.setDeltaX(-1);
 			}
-			if(e.getKeyCode()==KeyEvent.VK_RIGHT) {
+
+			if(e.getKeyCode() == KeyEvent.VK_RIGHT && attractModeActive == false) {
 				paddle1.setDeltaX(+1);
+			}
+
+			if(e.getKeyCode() == KeyEvent.VK_SPACE && attractModeActive == true) {
+				attractModeActive = false;
+				
+				newPaddles();
+				newBall();
+				newBricks();
+				destroyWelcome();
+
+				lives = 3;
 			}
 			
 		}
@@ -278,21 +318,26 @@ public class GamePanel extends JPanel implements Runnable {
 		public void keyReleased(KeyEvent e) {
 			
 			//paddle1.keyReleased(e);
-			if(e.getKeyCode()==KeyEvent.VK_LEFT) {
+			if(e.getKeyCode() == KeyEvent.VK_LEFT && attractModeActive == false) {
 				paddle1.setDeltaX(0);
 			}
-			if(e.getKeyCode()==KeyEvent.VK_RIGHT) {
+			if(e.getKeyCode() == KeyEvent.VK_RIGHT && attractModeActive == false) {
 				paddle1.setDeltaX(0);
 			}
 			
-		
+			if(e.getKeyCode() == KeyEvent.VK_SPACE && attractModeActive == true) {
+				attractModeActive = false;
+				
+				newPaddles();
+				newBall();
+				newBricks();
+			}
 		}
 	
 	}
 	
 	public void checkIfLost(int lives) {
 		int remainingLives = lives;
-		System.out.println(lives);
 
 		if (remainingLives < 1) {
 			beginAttractMode();
@@ -300,7 +345,14 @@ public class GamePanel extends JPanel implements Runnable {
 	}
 
 	public void beginAttractMode() {
-		System.out.println("Beginnning attract mode.");
+		attractModePaddles();
+		newWelcome();
+
+		attractModeActive = true;
+	}
+
+	public void attractModePaddles() {
+		paddle1 = new Paddle(0, GAME_HEIGHT - (PADDLE_HEIGHT - DISTANZA / 2) - 50, GAME_WIDTH, PADDLE_HEIGHT);
 	}
 	
 } //end GamePanel

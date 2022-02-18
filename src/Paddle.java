@@ -11,9 +11,9 @@ public class Paddle extends Rectangle {
 	int dx;
 	int paddleSpeed = 6;
 
-	Paddle(int x, int y, int PADDLE_WIDTH, int PADDLE_HEIGHT){
+	Paddle(int x, int y, int PADDLE_WIDTH, int PADDLE_HEIGHT) {
 	
-		super(x,y,PADDLE_WIDTH,PADDLE_HEIGHT); //costruttore di Rectangle
+		super(x, y, PADDLE_WIDTH, PADDLE_HEIGHT); //costruttore di Rectangle
 				
 	}
 
