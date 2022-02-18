@@ -1,7 +1,6 @@
 //**********************************************************
 
 import java.io.*;
-
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;	//per utilizzare EventListner
@@ -14,12 +13,12 @@ public class GamePanel extends JPanel implements Runnable {
 	//definizione costanti
 	static final int GAME_WIDTH = 461;
 	static final int GAME_HEIGHT = (int)(GAME_WIDTH * (1.25));
-	static final Dimension SCREEN_SIZE1 = new Dimension(GAME_WIDTH,GAME_HEIGHT);
+	static final Dimension SCREEN_SIZE1 = new Dimension(GAME_WIDTH, GAME_HEIGHT);
 	
 	static final int PADDLE_WIDTH = 44;
 	static final int PADDLE_HEIGHT = 10;  //orizzontale
 	
-	static final Dimension SCREEN_SIZE = new Dimension(GAME_WIDTH,GAME_HEIGHT);
+	static final Dimension SCREEN_SIZE = new Dimension(GAME_WIDTH, GAME_HEIGHT);
 	static final int BALL_DIAMETER = 15;  //palla rotonda
 
 	static final int rows = 8;
@@ -163,11 +162,22 @@ public class GamePanel extends JPanel implements Runnable {
 			ball.dx= -ball.dx;	
 		}
 		
-		
-		
 		if (ball.intersects(paddle1)) {
 			ball.dy = -ball.dy;
 		}
+
+		// This code takes care of Brick collisions.
+		for (int r = 0; r < rows; r++) {
+			for (int t = 0; t < columns; t++) {
+				if (brick[r][t] != null) {
+					if (ball.intersects(brick[r][t])) {
+						brick[r][t] = null;
+						ball.dy = -ball.dy;
+					}
+				}
+			}
+		}
+
 		//---------------------------------------------------
 
 	
