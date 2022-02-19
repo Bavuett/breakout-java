@@ -12,9 +12,11 @@ public class Lives extends Rectangle {
     public void draw(Graphics g, Font atari, int GAME_WIDTH, int GAME_HEIGHT, int lives) {
         int livesRemaining = lives;
         String messageToDisplay = Integer.toString(livesRemaining);
+        FontMetrics fm = g.getFontMetrics();
+
         g.setFont(atari);
         g.setColor(Color.white);
-        g.drawString(messageToDisplay, (GAME_WIDTH) - 30, GAME_HEIGHT - 15);
+        g.drawString("LIVES " + messageToDisplay, (GAME_WIDTH) - 15 - fm.stringWidth("LIVES " + messageToDisplay), GAME_HEIGHT - 15);
     }
 	
 }

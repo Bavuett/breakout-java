@@ -13,7 +13,7 @@ public class Brick extends Rectangle {
 	int row, column;
 
 	Brick (int row, int column, int brickWidth, int brickHeight){
-		super(((row * brickWidth) + 1 * (row + 1)), ((column * brickHeight) + 1 * (column + 1)), brickWidth, brickHeight); //costruttore di Rectangle
+		super(((row * brickWidth) + 1 * (row + 1)), (brickHeight * 3) + ((column * brickHeight) + 1 * (column + 1)), brickWidth, brickHeight); //costruttore di Rectangle
 		this.row = row;
 		this.column = column;		
 	}

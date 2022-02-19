@@ -8,6 +8,8 @@ public class Ball extends Rectangle {
 	int dx;
 	int dy;
 	int ballSpeed = 2;
+	int vectorX;
+	int vectorY;
 	
 	Ball(int x, int y, int width, int height) {
 	
@@ -16,13 +18,13 @@ public class Ball extends Rectangle {
 		Random rand = new Random();
  
 		//double vectorX = rand.nextDouble(); 
-		int vectorX=rand.nextInt(2); 
+		int vectorX = rand.nextInt(2); 
 		if (vectorX == 0)
 			vectorX = -1;
 		setDX(vectorX);
 		
 		//double vectorY = rand.nextDouble();
-		int vectorY= rand.nextInt(2);
+		int vectorY = rand.nextInt(2);
 		if (vectorY == 0)
 			vectorY = -1;
 		setDY(vectorY);
@@ -38,15 +40,13 @@ public class Ball extends Rectangle {
 	}
 	
 	public void move() {	
-	
 		 x = x + dx;
 		 y = y + dy;
 	}
 
-	public void draw(Graphics g) {
-		g.setColor(Color.white);
-		g.fillOval(x, y, height, width); 
-		//g.fillOval(x, y, height, width); 
+	public void draw(Graphics g, Color color) {
+		g.setColor(color);
+		g.fillOval(x, y, height, width);  
 	}
 
 }

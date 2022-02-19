@@ -4,9 +4,11 @@ import java.io.*;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;	//per utilizzare EventListner
-import java.awt.image.*;  	//per utilizzare BufferedImage
+import java.awt.image.*; 
+import javax.sound.sampled.*;
 
 import javax.swing.*; //per utilizzare JPanel
+import javax.swing.plaf.TreeUI;
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -22,6 +24,13 @@ public class GamePanel extends JPanel implements Runnable {
 	static final int BALL_DIAMETER = 8;  //palla rotonda
 
 	int lives = 3;
+	int score = 0;
+	int hits = 0;
+	int choice = 0;
+	int inclinationSelection = 0;
+
+	String welcomeMessage = "PRESS SPACE";
+
 	boolean attractModeActive = true;
 
 	static final int rows = 14;
@@ -47,18 +56,26 @@ public class GamePanel extends JPanel implements Runnable {
 	Brick[][] brick;
 	Welcome welcome;
 	Lives livesUI;
+	Score scoreUI;
 	Font atari;
+	Color ballColor;
+	Random random;
+	Clip sound;
 	
 	GamePanel(){ //costruttore
-		Random random = new Random();
-		//creo una istanza "ball" dalla classe Ball al centro dello schermo ma ad una altezza casuale
+		random = new Random();
+
 		brick = new Brick[rows][columns];
 		livesUI = new Lives(GAME_WIDTH - 20, GAME_HEIGHT - 20, 20, 20);
+		scoreUI = new Score(GAME_WIDTH - 20, GAME_HEIGHT - 20, 20, 20);
+		ballColor = Color.white;
 
 		try {
 			atari = Font.createFont(Font.TRUETYPE_FONT, new FileInputStream("src/fonts/Atari.ttf")).deriveFont(20f);
 		} catch (Exception e) {
+			
 			e.printStackTrace();
+		
 		}
 	
 		this.setFocusable(true);
@@ -98,8 +115,12 @@ public class GamePanel extends JPanel implements Runnable {
 		}
 	}
 
+	// Spawns a new Ball, makes it go to the bottom, and resets the hits.
 	public void newBall() {
 		ball = new Ball((GAME_WIDTH / 2) - (BALL_DIAMETER / 2), (GAME_HEIGHT / 2) - (BALL_DIAMETER / 2), BALL_DIAMETER, BALL_DIAMETER);
+		ball.setDY(1);
+		
+		hits = 0;
 	}
 
 	public void newWelcome() {
@@ -107,7 +128,19 @@ public class GamePanel extends JPanel implements Runnable {
 	}
 
 	public void destroyWelcome() {
-		welcome = null;
+		welcomeMessage = " ";
+	}
+
+	public void playSound(String fileName) {
+		try {
+			sound = AudioSystem.getClip();
+			sound.open(AudioSystem.getAudioInputStream(getClass().getResource("audio/" + fileName)));	
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Couldn't play sound due to an error. Check above this message to see what happened.");
+		}
+
+		sound.start();
 	}
 	
 //------------------------------- non toccare -------------------------------
@@ -127,13 +160,38 @@ public class GamePanel extends JPanel implements Runnable {
 
 
 	public void draw(Graphics g) {
+
+		if (attractModeActive == true) {
+
+			switch (choice) {
+				case 0:
+					ballColor = Color.cyan;
+					break;
+				case 1:
+					ballColor = Color.magenta;
+					break;
+				case 2:
+					ballColor = Color.red;
+					break;
+				case 3:
+					ballColor = Color.orange;
+					break;
+				case 4:
+					ballColor = Color.yellow;
+					break;
+				case 5:
+					ballColor = Color.green;
+					break;
+				default: 
+					ballColor = Color.white;
+					break;
+			}
+
+		}
 		
 		paddle1.draw(g);
-		ball.draw(g);
-
-		if (welcome != null) {
-			welcome.draw(g, atari, GAME_WIDTH, GAME_HEIGHT);
-		}
+		ball.draw(g, ballColor);
+		welcome.draw(g, atari, GAME_WIDTH, GAME_HEIGHT, welcomeMessage);
 
 		for (int p = 0; p < rows; p++) {
 			for (int l = 0; l < columns; l++) {
@@ -144,6 +202,7 @@ public class GamePanel extends JPanel implements Runnable {
 		}
 		
 		livesUI.draw(g, atari, GAME_WIDTH, GAME_HEIGHT, lives);
+		scoreUI.draw(g, atari, GAME_WIDTH, GAME_HEIGHT, score);
 		// disegna altri oggetti qui
 		
         // the following line helps with animation ---------------------------
@@ -160,26 +219,22 @@ public class GamePanel extends JPanel implements Runnable {
 		paddle1.move();
 		ball.move();
 		
-		// muovi altri oggetti qui
-		
 	}
 
 	public void checkCollision() {
 		
-	
-		//---- stops paddles at window edges ----------------
 		if (paddle1.x <= 0)
 			paddle1.x = 0;
 
 		if (paddle1.x >= GAME_WIDTH-PADDLE_WIDTH) 
-			paddle1.x = GAME_WIDTH-PADDLE_WIDTH; 
-		
+			paddle1.x = GAME_WIDTH - PADDLE_WIDTH; 
 		
 		if (ball.y <= 0) {
 			ball.dy= -ball.dy;
+			playSound("boundary.wav");
 		}
 
-		if (ball.y >= GAME_HEIGHT-BALL_DIAMETER) {
+		if (ball.y >= GAME_HEIGHT - BALL_DIAMETER) {
 			ball.dy= -ball.dy;
 
 			if (lives > 0) {
@@ -188,52 +243,116 @@ public class GamePanel extends JPanel implements Runnable {
 
 			checkIfLost(lives);
 			newBall();
+			playSound("boundary.wav");
 		}
 		//----- la palla rimbalza quando tocca i margini destro e sinistro della finestra ------
-		if (ball.x <=0) {
-			ball.dx= -ball.dx;	
+		if (ball.x <= 0) {
+			ball.dx= -ball.dx;
+			playSound("boundary.wav");	
+
+			if (attractModeActive == true) {
+				choice = random.nextInt(6);
+			}
 		}
 
 		if (ball.x >= GAME_WIDTH-BALL_DIAMETER) {
-			ball.dx= -ball.dx;	
+			ball.dx= -ball.dx;
+			playSound("boundary.wav");
+			
+			if (attractModeActive == true) {
+				choice = random.nextInt(6);
+			}
 		}
 		
 		// This code handles collisions with the Paddle.
 		if (ball.intersects(paddle1)) {
 			double inclination;
 
-			// This awful if-else chain handles the inclination the Ball needs to take when 
-			// having a collision with the Paddle. This ensures the Ball does not go in the same
-			// places and keeps the game fun.
-			if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + PADDLE_WIDTH / 8) {
-				inclination = 1.6;
-			} else {
-				if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 2) {
-					inclination = 1.4;
+			// This checks if the game is in Attract Mode when having a collision with the Paddle.
+			if (attractModeActive != true) {
+
+				// This keeps track of how many times the Ball touched the Paddle.
+				// It's going to be useful to set the speed.
+				hits = hits + 1;
+
+				// This awful if-else chain handles the inclination the Ball needs to take when 
+				// having a collision with the Paddle. This ensures the Ball does not go in the same
+				// places and keeps the game fun.
+				if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + PADDLE_WIDTH / 8) {
+					inclination = 1.6;
 				} else {
-					if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 3) {
-						inclination = 0.7;
+					if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 2) {
+						inclination = 1.4;
 					} else {
-						if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 5) {
-							inclination = 0;
+						if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 3) {
+							inclination = 0.7;
 						} else {
-							if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 6) {
-								inclination = -0.7;
+							if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 5) {
+								inclination = 0;
 							} else {
-								if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 7) {
-									inclination = -1.4;
+								if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 6) {
+									inclination = -0.7;
 								} else {
-									inclination = -1.6;
+									if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 7) {
+										inclination = -1.4;
+									} else {
+										inclination = -1.6;
+									}
 								}
 							}
 						}
-					}
-				}	
+					}	
+				}
+
+			} else {
+				
+				// If the game is in Attract Mode, choose a Random Inclination.
+				// Also, change the ball's color.
+				choice = random.nextInt(6);
+
+				inclinationSelection = random.nextInt(3);
+				
+				switch (inclinationSelection) {
+					case 0:
+						inclination = 1.6;
+						break;
+					case 1:
+						inclination = 1.4;
+						break;
+					case 2:
+						inclination = 0.7;
+						break;
+					default: 
+						inclination = 0;
+						break;
+				}
+
+				inclinationSelection = random.nextInt(2);
+
+				if (inclinationSelection == 0) {
+					inclination = inclination * -1;
+				}
+				
+			}
+
+			// Calculating the Ball's speed.
+			if (hits < 4) {
+				ball.setDY(1);
+			}
+
+			if (hits >= 4 && hits < 12) {
+				ball.setDY(1.5);
+			}
+
+			if (hits >= 12) {
+				ball.setDY(2);
 			}
 
 			// Setting the values inside the class after calculating the inclination.
 			ball.dy = -ball.dy;
 			ball.setDX(inclination);
+			playSound("paddle.wav");
+
 		}
 
 		// This code takes care of Brick collisions.
@@ -242,15 +361,49 @@ public class GamePanel extends JPanel implements Runnable {
 				if (brick[r][t] != null) {
 					if (ball.intersects(brick[r][t])) {
 						ball.dy = -ball.dy;
+						playSound("brick.wav");
 						
 						if (attractModeActive != true) {
 							brick[r][t] = null;
+
+							// This Switch gives proper score based on the Brick's position,
+							// just like the original game.
+							switch (t) {
+								case 0: 
+									score += 7;
+									break;
+								case 1: 
+									score += 7;
+									break;
+								case 2:
+									score += 5;
+									break;
+								case 3:
+									score += 5; 
+									break;
+								case 4:
+									score += 3;
+									break;
+								case 5:
+									score += 3;
+									break;
+								default:
+									score += 1;
+									break;
+							}
+							
+							if (score > 447) {
+								beginAttractMode();
+								welcomeMessage = "YOU WON!";
+							}
+
+						} else {
+							choice = random.nextInt(4);
 						}
 					}
 				}
 			}
 		}
-
 		//---------------------------------------------------
 
 	
@@ -269,10 +422,9 @@ public class GamePanel extends JPanel implements Runnable {
 			lastTime = now;
 
 			if(delta >=1) {
-			
 				move();  //calls move() method for paddle1...
 				checkCollision(); //checks collisions of paddles and boundary
-			
+
 				repaint(); //is used to tell a component (gamepanel) to repaint itself.
 				delta--;
 			} //end if
@@ -304,12 +456,7 @@ public class GamePanel extends JPanel implements Runnable {
 			if(e.getKeyCode() == KeyEvent.VK_SPACE && attractModeActive == true) {
 				attractModeActive = false;
 				
-				newPaddles();
-				newBall();
-				newBricks();
-				destroyWelcome();
-
-				lives = 3;
+				beginGame();
 			}
 			
 		}
@@ -317,21 +464,14 @@ public class GamePanel extends JPanel implements Runnable {
 		//questo metodo FERMA il paddle rilasciando il tasto, azzerando il DeltaX
 		public void keyReleased(KeyEvent e) {
 			
-			//paddle1.keyReleased(e);
 			if(e.getKeyCode() == KeyEvent.VK_LEFT && attractModeActive == false) {
 				paddle1.setDeltaX(0);
 			}
+
 			if(e.getKeyCode() == KeyEvent.VK_RIGHT && attractModeActive == false) {
 				paddle1.setDeltaX(0);
 			}
 			
-			if(e.getKeyCode() == KeyEvent.VK_SPACE && attractModeActive == true) {
-				attractModeActive = false;
-				
-				newPaddles();
-				newBall();
-				newBricks();
-			}
 		}
 	
 	}
@@ -349,10 +489,23 @@ public class GamePanel extends JPanel implements Runnable {
 		newWelcome();
 
 		attractModeActive = true;
+		welcomeMessage = "PRESS SPACE";
 	}
 
 	public void attractModePaddles() {
 		paddle1 = new Paddle(0, GAME_HEIGHT - (PADDLE_HEIGHT - DISTANZA / 2) - 50, GAME_WIDTH, PADDLE_HEIGHT);
+	}
+
+	public void beginGame() {
+		newPaddles();
+		newBall();
+		newBricks();
+		destroyWelcome();
+
+		lives = 3;
+		score = 0;
+
+		ballColor = Color.white;
 	}
 	
 } //end GamePanel
