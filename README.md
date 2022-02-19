@@ -30,3 +30,8 @@ Assuming you meet all the requirements, you can install the latest version of th
 There you'll also find instructions on running it on Windows. Instructions for other OSs may come in the future.
 
 [Install Breakout in Java.](https://github.com/DevLBD/Breakout-Java/releases)
+
+## Credits.
+
+The original authors of this awesome game. I had lots of fun re-developing it. \
+Massimilano La Rocca, my Computer Science teacher. Thanks for your commitment in finding new ways to teach us new things.
