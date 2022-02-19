@@ -33,6 +33,7 @@ public class GamePanel extends JPanel implements Runnable {
 
 	boolean attractModeActive = true;
 	boolean soundPlaying;
+	boolean allCleared;
 
 	static final int rows = 14;
 	static final int columns = 8;
@@ -75,9 +76,7 @@ public class GamePanel extends JPanel implements Runnable {
 			InputStream fontLocation = getClass().getResourceAsStream("fonts/Atari.ttf");
 			atari = Font.createFont(Font.TRUETYPE_FONT, fontLocation).deriveFont(20f);
 		} catch (Exception e) {
-			
 			e.printStackTrace();
-		
 		}
 	
 		this.setFocusable(true);
@@ -170,6 +169,7 @@ public class GamePanel extends JPanel implements Runnable {
 
 
 	public void draw(Graphics g) {
+		allCleared = true;
 
 		if (attractModeActive == true) {
 
@@ -207,10 +207,16 @@ public class GamePanel extends JPanel implements Runnable {
 			for (int l = 0; l < columns; l++) {
 				if (brick[p][l] != null) {
 					brick[p][l].draw(g);
+					allCleared = false;
 				}
 			}
 		}
 		
+		if (allCleared == true) {
+			beginAttractMode();
+			welcomeMessage = "YOU WON!";
+		}
+
 		livesUI.draw(g, atari, GAME_WIDTH, GAME_HEIGHT, lives);
 		scoreUI.draw(g, atari, GAME_WIDTH, GAME_HEIGHT, score);
 		// disegna altri oggetti qui
@@ -402,10 +408,6 @@ public class GamePanel extends JPanel implements Runnable {
 									break;
 							}
 							
-							if (score > 447) {
-								beginAttractMode();
-								welcomeMessage = "YOU WON!";
-							}
 
 						} else {
 							choice = random.nextInt(4);
