@@ -32,6 +32,7 @@ public class GamePanel extends JPanel implements Runnable {
 	String welcomeMessage = "PRESS SPACE";
 
 	boolean attractModeActive = true;
+	boolean soundPlaying;
 
 	static final int rows = 14;
 	static final int columns = 8;
@@ -71,7 +72,8 @@ public class GamePanel extends JPanel implements Runnable {
 		ballColor = Color.white;
 
 		try {
-			atari = Font.createFont(Font.TRUETYPE_FONT, new FileInputStream("src/fonts/Atari.ttf")).deriveFont(20f);
+			InputStream fontLocation = getClass().getResourceAsStream("fonts/Atari.ttf");
+			atari = Font.createFont(Font.TRUETYPE_FONT, fontLocation).deriveFont(20f);
 		} catch (Exception e) {
 			
 			e.printStackTrace();
@@ -132,15 +134,23 @@ public class GamePanel extends JPanel implements Runnable {
 	}
 
 	public void playSound(String fileName) {
-		try {
-			sound = AudioSystem.getClip();
-			sound.open(AudioSystem.getAudioInputStream(getClass().getResource("audio/" + fileName)));	
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("Couldn't play sound due to an error. Check above this message to see what happened.");
+		
+		if (soundPlaying == false) {
+			try {
+				sound = AudioSystem.getClip();
+				sound.open(AudioSystem.getAudioInputStream(getClass().getResource("audio/" + fileName)));
+				soundPlaying = true;
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println("Couldn't play sound due to an error. Check above this message to see what happened.");
+			}
 		}
 
-		sound.start();
+		if (soundPlaying == true) {
+			sound.start();
+		}
+		
+		soundPlaying = false;
 	}
 	
 //------------------------------- non toccare -------------------------------
