@@ -19,17 +19,20 @@ This is a fan-recreation which was assigned by my Computer Science teacher to te
 
 ## Requirements.
 
-If you'd like to run the project on your machine, you need Java 17 or greater. \
+There are no requirements if you Install the app using the ``` .msi ``` file since it contains everything you need to get started. 
+
+However, if you'd like to run the project on your machine without any installation, you need Java 17 or greater. \
 You can verify which version of Java you are using by typing ``` java -version ``` on your OS's command line shell.
 
 Here is the [Java 17's download page](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html), in case you need it.
 
 ## Installation.
 
-Assuming you meet all the requirements, you can install the latest version of the project using the link below. \
-There you'll also find instructions on running it on Windows. Instructions for other OSs may come in the future.
+All the files you need to Install and Run the app on your Windows machine are available below. 
 
-[Install Breakout in Java.](https://github.com/DevLBD/Breakout-Java/releases)
+In case you do not use Windows, you may compile an Installer for your machine using [jpackage](https://docs.oracle.com/en/java/javase/14/docs/specs/man/jpackage.html), or run the project without making an Installer. Instructions are available on the download page.
+
+[Install Breakout in Java](https://github.com/DevLBD/Breakout-Java/releases).
 
 ## Credits.
 
