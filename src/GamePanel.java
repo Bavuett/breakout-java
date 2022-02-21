@@ -17,7 +17,7 @@ public class GamePanel extends JPanel implements Runnable {
 	static final int GAME_HEIGHT = (int)(GAME_WIDTH * (1.25));
 	static final Dimension SCREEN_SIZE1 = new Dimension(GAME_WIDTH, GAME_HEIGHT);
 	
-	static final int PADDLE_WIDTH = 44;
+	static final int PADDLE_WIDTH = 55;
 	static final int PADDLE_HEIGHT = 10;  //orizzontale
 	
 	static final Dimension SCREEN_SIZE = new Dimension(GAME_WIDTH, GAME_HEIGHT);
@@ -419,30 +419,30 @@ public class GamePanel extends JPanel implements Runnable {
 		//---------------------------------------------------
 
 	
-	} // end checkCollision()
+	}
 
-	public void run() { //game loop
+	public void run() { 
 
 		long lastTime = System.nanoTime();
-		double amountOfFPS = 60.0; // frames in 1 second
-		double duration = 1000000000 / amountOfFPS; //interval (time in ns) beetween 2 frames
+		double amountOfFPS = 60.0;
+		double duration = 1000000000 / amountOfFPS; 
 		double delta = 0;
 
-		while(true) { //per sempre
+		while (true) { 
 			long now = System.nanoTime();
-			delta += (now - lastTime) / duration; // tempo trascorso è > intervallo? se sì, incrementa delta
+			delta += (now - lastTime) / duration;
 			lastTime = now;
 
 			if(delta >=1) {
-				move();  //calls move() method for paddle1...
-				checkCollision(); //checks collisions of paddles and boundary
+				move();
+				checkCollision();
 
-				repaint(); //is used to tell a component (gamepanel) to repaint itself.
+				repaint(); 
 				delta--;
-			} //end if
-		} //end while
+			} 
+		}
 		
-	} //end run()
+	}
 	
 	
 	public class AL extends KeyAdapter{  
