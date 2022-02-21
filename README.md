@@ -13,8 +13,10 @@ This is a fan-recreation which was assigned by my Computer Science teacher to te
 #### Screenshots
 
 <div style="display: flex">
-  <img src="https://raw.githubusercontent.com/DevLBD/Breakout-Java/main/repo-img/Breakout-1.jpg" width="300px"/>
-  <img src="https://raw.githubusercontent.com/DevLBD/Breakout-Java/main/repo-img/Breakout-2.jpg" width="300px"/>
+  <img src="https://raw.githubusercontent.com/DevLBD/Breakout-Java/main/repo-img/Breakout-1.jpg" width="200px"/>
+  <img src="https://raw.githubusercontent.com/DevLBD/Breakout-Java/main/repo-img/Breakout-2.jpg" width="200px"/>
+  <img src="https://raw.githubusercontent.com/DevLBD/Breakout-Java/main/repo-img/Breakout-3.png" width="200px"/>
+  <img src="https://raw.githubusercontent.com/DevLBD/Breakout-Java/main/repo-img/Breakout-4.jpg" width="200px"/>
 </div>
 
 ## Requirements.
