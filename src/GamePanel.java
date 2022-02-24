@@ -295,24 +295,29 @@ public class GamePanel extends JPanel implements Runnable {
 				// having a collision with the Paddle. This ensures the Ball does not go in the same
 				// places and keeps the game fun.
 				if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + PADDLE_WIDTH / 8) {
-					inclination = 1.6;
+					inclination = -1.6;
 				} else {
 					if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 2) {
-						inclination = 1.4;
+						inclination = -1.4;
 					} else {
 						if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 3) {
-							inclination = 0.7;
+							inclination = -0.7;
 						} else {
 							if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 5) {
-								inclination = 0;
+								inclination = 0.55;
+
+								if (random.nextInt(2) == 0) {
+									inclination = inclination * -1;
+								}
+
 							} else {
 								if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 6) {
-									inclination = -0.7;
+									inclination = 0.7;
 								} else {
 									if (ball.x + (BALL_DIAMETER / 2) <= paddle1.x + (PADDLE_WIDTH / 8) * 7) {
-										inclination = -1.4;
+										inclination = 1.4;
 									} else {
-										inclination = -1.6;
+										inclination = 1.6;
 									}
 								}
 							}
@@ -339,7 +344,7 @@ public class GamePanel extends JPanel implements Runnable {
 						inclination = 0.7;
 						break;
 					default: 
-						inclination = 0;
+						inclination = 0.55;
 						break;
 				}
 

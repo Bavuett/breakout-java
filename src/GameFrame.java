@@ -15,7 +15,7 @@ public class GameFrame extends JFrame {
 		
 		this.getContentPane().add(panel); //finestra Swing
 		
-		this.setTitle("Bricks Crusher");
+		this.setTitle("Bricks Crusher: Break the Bricks");
 		this.setResizable(false);
 		this.setBackground(Color.black);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
