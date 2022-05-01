@@ -36,6 +36,10 @@ In case you do not use Windows, you may compile an Installer for your machine us
 
 [Install Breakout in Java](https://github.com/DevLBD/Breakout-Java/releases).
 
+If you are on Windows, another easy way to install the game is through the [Microsoft Store](https://www.microsoft.com/it-it/p/bricks-crusher-break-the-bricks/).
+
+[<img src="https://raw.githubusercontent.com/DevLBD/Breakout-Java/main/repo-img/MSbadge.png" width="200px"/>](https://www.microsoft.com/it-it/p/bricks-crusher-break-the-bricks/)
+
 ## Credits.
 
 The original authors of this awesome game. I had lots of fun re-developing it. \

@@ -462,11 +462,11 @@ public class GamePanel extends JPanel implements Runnable {
 		public void keyPressed(KeyEvent e) {
 			
 			//paddle1.keyPressed(e);
-			if(e.getKeyCode() == KeyEvent.VK_LEFT && attractModeActive == false) {
+			if((e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) && attractModeActive == false) {
 				paddle1.setDeltaX(-1);
 			}
 
-			if(e.getKeyCode() == KeyEvent.VK_RIGHT && attractModeActive == false) {
+			if((e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) && attractModeActive == false) {
 				paddle1.setDeltaX(+1);
 			}
 
@@ -481,11 +481,11 @@ public class GamePanel extends JPanel implements Runnable {
 		//questo metodo FERMA il paddle rilasciando il tasto, azzerando il DeltaX
 		public void keyReleased(KeyEvent e) {
 			
-			if(e.getKeyCode() == KeyEvent.VK_LEFT && attractModeActive == false) {
+			if((e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) & attractModeActive == false) {
 				paddle1.setDeltaX(0);
 			}
 
-			if(e.getKeyCode() == KeyEvent.VK_RIGHT && attractModeActive == false) {
+			if((e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) && attractModeActive == false) {
 				paddle1.setDeltaX(0);
 			}
 			
